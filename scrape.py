@@ -199,6 +199,9 @@ def check_default_args(params, fname, mode):
     for arg in REQUIRED_YAML_ARGS:
         assert arg in params, 'yaml_file "{}" with mode "{}" missing required argument "{}"'.format(fname, mode, arg)
 
+    for arg in params:
+        assert arg in REQUIRED_YAML_ARGS, 'yaml_file "{}" with mode "{}" contains non-existing argument "{}". See all arguments:\n{}'.format(fname, mode, arg, str(REQUIRED_YAML_ARGS))
+
     return params
 
 def get_params(card, mode):
