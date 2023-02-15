@@ -1,0 +1,67 @@
+low_mileage_low_price_awd:
+  search_filters:
+    auto_drivetrain:
+    - 3
+    auto_title_status:
+    - 1
+    - 3
+    auto_transmission:
+    - 1
+    - 2
+    bundleDuplicates: 1
+    hasPic: 1
+    max_auto_miles: 130000
+    min_auto_miles: 40000
+    max_price: 8000
+    min_price: 1200
+    postedToday: 1
+    purveyor: 
+    - owner
+  refresh_rate: 5 # seconds
+  refresh_sigma: 3 # seconds
+  target: luclepot@berkeley.edu
+  name: awd_cars
+
+
+
+low_mileage_low_price_manual:
+  search_filters:
+    auto_title_status:
+    - 1
+    - 3
+    auto_transmission:
+    - 1
+    bundleDuplicates: 1
+    hasPic: 1
+    max_auto_miles: 130000
+    min_auto_miles: 40000
+    max_price: 7000
+    min_price: 1200
+    postedToday: 1
+    purveyor:
+    - owner
+  refresh_rate: 5 # seconds
+  refresh_sigma: 3 # seconds
+  target: luclepot@berkeley.edu
+  name: manual_cars
+
+low_mileage_low_price_automatic:
+  search_filters:
+    auto_title_status:
+    - 1
+    - 3
+    auto_transmission:
+    - 2
+    bundleDuplicates: 1
+    hasPic: 1
+    max_auto_miles: 130000
+    min_auto_miles: 40000
+    max_price: 7000
+    min_price: 1200
+    postedToday: 1
+    purveyor:
+    - owner
+  refresh_rate: 5 # seconds
+  refresh_sigma: 3 # seconds
+  target: luclepot@berkeley.edu
+  name: automatic_cars
