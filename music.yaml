@@ -1,0 +1,6 @@
+rhodes_sfbay:
+  direct_link: https://sfbay.craigslist.org/search/msa?hasPic=1&max_price=5000&min_price=150&purveyor=owner&query=rhodes#search=1~gallery~0~0
+  refresh_rate: 60 # seconds
+  refresh_sigma: 3 # seconds
+  target: luclepot@berkeley.edu
+  name: rhodes_sfbay

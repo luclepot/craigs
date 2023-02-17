@@ -26,12 +26,16 @@ DEFAULT_YAML_ARGS = {
     'password_file': 'drivers/app.pass',
     'headless': True,
     'locale': 'sfbay',
-    'category': 'cta'
+    'category': 'cta',
+    'sublocale': None,
+    'direct_link': None,
+    'search_filters': {}
 }
 REQUIRED_YAML_ARGS = {
     'refresh_rate', 'name', 'search_filters',
     'target', 'port', 'refresh_sigma', 'uname',
-    'password_file', 'headless', 'locale', 'category'
+    'password_file', 'headless', 'locale', 'category',
+    'sublocale', 'direct_link'
 }
 
 def insert_tag(link, tag, value):
@@ -48,12 +52,28 @@ def insert_tag(link, tag, value):
 
     return '#search'.join([l,r])
 
+# def deconstruct_craigslist_link(link):
+    
+
 def construct_craigslist_link(
     locale,
     category,
+    sublocale,
+    link,
     **kwargs
 ):
-    link = "https://{}.craigslist.org/search/{}#search=1~list~0~0".format(locale, category)
+    if link is not None:
+        l, suffix = link.split('#search=1')
+        if not suffix.startswith('~list'):
+            suffix = '~list~0~0'
+        link = l + '#search=1' + suffix
+        return link
+    
+    if sublocale is not None:
+        sublocale += '/'
+    else:
+        sublocale = ''
+    link = "https://{}.craigslist.org/search/{}{}#search=1~list~0~0".format(locale, sublocale, category)
     for k,v in kwargs.items():
         link = insert_tag(link, k, v)
     return link
@@ -201,6 +221,10 @@ def check_default_args(params, fname, mode):
 
     for arg in params:
         assert arg in REQUIRED_YAML_ARGS, 'yaml_file "{}" with mode "{}" contains non-existing argument "{}". See all arguments:\n{}'.format(fname, mode, arg, str(REQUIRED_YAML_ARGS))
+        
+    if params['direct_link'] is None:
+        if len(params['search_filters']) == 0:
+            raise ValueError('Must specify either a search link or search filters!!')
 
     return params
 
@@ -238,16 +262,20 @@ def main_loop():
         options=options,
     )
 
-    link = construct_craigslist_link(params['locale'], params['category'], **params['search_filters'])
+    link = construct_craigslist_link(params['locale'], params['category'], params['sublocale'], params['direct_link'], **params['search_filters'])
     print(' RUNNING FOR LINK "{}"'.format(link))
     print()
-    print(' SEARCH PARAMETERS:')
-    
-    fmt = '    {:>25} = {:<}'
-    for k in ['locale', 'category']:
-        print(fmt.format(k, params[k]))
-    for k, v in params['search_filters'].items():
-        print(fmt.format(k, str(v)))
+    if params['direct_link'] is not None:
+        print(' Using direct link, parameters ignored')
+    else:
+        print(' SEARCH PARAMETERS:')
+        
+
+        fmt = '    {:>25} = {:<}'
+        for k in ['locale', 'category']:
+            print(fmt.format(k, params[k]))
+        for k, v in params['search_filters'].items():
+            print(fmt.format(k, str(v)))
     print()
     
     driver.open_link(link)
