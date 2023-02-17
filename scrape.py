@@ -52,9 +52,6 @@ def insert_tag(link, tag, value):
 
     return '#search'.join([l,r])
 
-# def deconstruct_craigslist_link(link):
-    
-
 def construct_craigslist_link(
     locale,
     category,
@@ -326,8 +323,3 @@ def main_loop():
 
 if __name__ == "__main__":
     main_loop()
-# util = lucs_tools.internet.internet_base_util(
-#     driver_path="drivers/chromedriver.exe",
-#     data_path="data/",
-
-# )
