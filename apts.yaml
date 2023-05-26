@@ -1,0 +1,34 @@
+bdr1_cole:
+  direct_link: https://sfbay.craigslist.org/search/sfc/hhh?max_bedrooms=1&min_bedrooms=1&nh=5&sort=priceasc#search=1~gallery~0~0
+  refresh_rate: 60 # seconds
+  refresh_sigma: 3 # seconds
+  target: luclepot@berkeley.edu
+  name: bdr1_cole
+  
+bdr2_cole:
+  direct_link: https://sfbay.craigslist.org/search/sfc/hhh?max_bedrooms=1&min_bedrooms=1&nh=5&sort=priceasc#search=1~gallery~0~0
+  refresh_rate: 60 # seconds
+  refresh_sigma: 3 # seconds
+  target: luclepot@berkeley.edu
+  name: bdr1_cole
+  
+all_2bedrooms:
+  direct_link: https://sfbay.craigslist.org/search/sfc/hhh?max_bedrooms=2&min_bedrooms=2&nh=10&nh=11&nh=14&nh=149&nh=15&nh=16&nh=24&nh=26&nh=4&nh=5&postedToday=1&sort=priceasc#search=1~gallery~0~0
+  refresh_rate: 3600
+  refresh_sigma: 3
+  target: luclepot@berkeley.edu
+  name: all_2bedrooms
+  
+all_1bedrooms:
+  direct_link: https://sfbay.craigslist.org/search/sfc/hhh?max_bedrooms=1&min_bedrooms=1&nh=10&nh=11&nh=14&nh=149&nh=15&nh=16&nh=24&nh=26&nh=4&nh=5&postedToday=1&sort=priceasc#search=1~gallery~0~0
+  refresh_rate: 3600
+  refresh_sigma: 3
+  target: luclepot@berkeley.edu
+  name: all_1bedrooms
+  
+all_0bedrooms:
+  direct_link: https://sfbay.craigslist.org/search/sfc/hhh?max_bedrooms=0&min_bedrooms=0&nh=10&nh=11&nh=14&nh=149&nh=15&nh=16&nh=24&nh=26&nh=4&nh=5&postedToday=1&sort=priceasc#search=1~gallery~0~0
+  refresh_rate: 3600
+  refresh_sigma: 3
+  target: luclepot@berkeley.edu
+  name: all_0bedrooms

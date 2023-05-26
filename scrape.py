@@ -18,6 +18,8 @@ import datetime
 import warnings
 from selenium.common.exceptions import NoSuchElementException
 
+DRIVER_PATH = "drivers/chromedriver_mac_arm64/chromedriver"
+
 DEFAULT_YAML_ARGS = {
     'target': "luclepot@berkeley.edu",
     'port': 465,
@@ -178,15 +180,21 @@ def setup_email_server(port, gmail_uname, password_file):
     return port, "{}@gmail.com".format(gmail_uname), password, ssl.create_default_context()
 
 def update_local_index(search, path):
-    old = load_saved_index(path + '.npy' if not path.endswith('.npy') else path)
-
+    index_path = path + '.npy' if not path.endswith('.npy') else path
+    data_path = index_path.replace('.npy', '.pkl')
+    
+    old = load_saved_index(index_path)
+    old_data = load_saved_data(data_path)
+    
     idx = ~search.code.isin(old)
     new = (search.code[idx]).values.astype(np.int64)
     new_search = search[idx]
 
     combined = np.concatenate([old, new])
+    combined_data = pd.concat([old_data, new_search])
 
-    update_saved_index(combined, path)
+    update_saved_index(combined, index_path)
+    update_saved_data(combined_data, data_path)
 
     return new, new_search
 
@@ -194,19 +202,30 @@ def update_saved_index(d, path):
     np.save(path, d)
     return 0
 
+def update_saved_data(d, path):
+    d.to_pickle(path)
+    return 0
+
 def load_saved_index(path):
     try:
         return np.load(path).astype(np.int64)
     except:
-        return np.array([]).astype(np.int64)
+        return np.array([]).astype(np.int64) 
+
+def load_saved_data(path):
+    try:
+        return pd.read_pickle(path)
+    except:
+        return pd.DataFrame()
 
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('parameter_file', help='YAML file specifying search critera for craigslist search')
     parser.add_argument('-m', '--mode', default=None, type=str, help='name of mode in yaml file, optional')
-
+    parser.add_argument('--no-email', default=True, dest='do_email', action='store_false', help='boolean flag for NOT sending an email')
+    parser.add_argument('-n', '--n-iterations', default=-1, dest='n_iter', type=int, help='maximum number of iterations (-1 for infinite)')
     args = parser.parse_args()
-    return args.parameter_file, args.mode
+    return args.parameter_file, args.mode, args.do_email, args.n_iter
 
 def check_default_args(params, fname, mode):
     for arg in DEFAULT_YAML_ARGS:
@@ -241,7 +260,7 @@ def get_params(card, mode):
 def main_loop():
     # port=465, uname='bobisloaded', wait_time=3600):
 
-    card, mode = get_args()
+    card, mode, do_email, n_iter = get_args()
     params, mode = get_params(card, mode)
         
     # setup timing information
@@ -254,7 +273,7 @@ def main_loop():
     if params['headless']:
         options.add_argument('--headless')
     driver = lucs_tools.internet.internet_base_util(
-        driver_path="drivers/chromedriver.exe",
+        driver_path=DRIVER_PATH,
         data_path=data_path,
         options=options,
     )
@@ -274,13 +293,16 @@ def main_loop():
         for k, v in params['search_filters'].items():
             print(fmt.format(k, str(v)))
     print()
+    print(" do_email: {}".format(do_email))
+    print(" headless: {}".format(params["headless"]))
+    print()
     
     driver.open_link(link)
     
     run_loop = True
     port, myemail, password, context = setup_email_server(params['port'], params['uname'], params['password_file'])
     
-
+    time.sleep(1)
     while run_loop:
         try:
             if sleep_time > 0:
@@ -288,13 +310,15 @@ def main_loop():
             start_time = time.time()
             driver.driver.refresh()
             data = scrape_list(driver, header=search_header(i, start_time))
+            
             new_idx, new_search = update_local_index(data, data_path)
 
             if len(new_idx) > 0:
-                # setup email stuff
-                with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
-                    server.login(myemail, password)
-                    send_email(new_search, server, params['target'], myemail, params['name'])
+                if do_email:
+                    # setup email stuff
+                    with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
+                        server.login(myemail, password)
+                        send_email(new_search, server, params['target'], myemail, params['name'])
 
             end_time = time.time()
             sleep_time = (
@@ -308,6 +332,9 @@ def main_loop():
             del new_idx
             
             i += 1
+            if i > n_iter:
+                # break statement
+                run_loop = False
         except urllib3.exceptions.ProtocolError:
             print('FAILED, retrying')
         except KeyboardInterrupt:
